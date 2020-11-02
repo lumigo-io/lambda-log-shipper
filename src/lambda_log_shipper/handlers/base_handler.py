@@ -8,11 +8,11 @@ from lambda_log_shipper.utils import get_logger
 
 
 class LogType(Enum):
-    start = 'start'
-    end = 'end'
-    report = 'report'
-    function = 'function'
-    extension = 'extension'
+    start = "start"
+    end = "end"
+    report = "report"
+    function = "function"
+    extension = "extension"
 
     @staticmethod
     def parse(record_type):
@@ -40,7 +40,7 @@ class LogRecord:
         return LogRecord(
             log_type=LogType.parse(record["type"]),
             log_time=datetime.fromisoformat(record["time"][:-1]),
-            record=record["record"]
+            record=record["record"],
         )
 
 
@@ -59,7 +59,9 @@ class LogsHandler:
         new_records = [LogRecord.parse(r) for r in raw_records]
         self.pending_logs.extend(new_records)
         big_batch = len(self.pending_logs) >= Configuration.min_batch_size
-        old_batch = (datetime.now() - self.last_sent_time).total_seconds() >= Configuration.min_batch_time
+        old_batch = (
+            datetime.now() - self.last_sent_time
+        ).total_seconds() >= Configuration.min_batch_time
         if big_batch or old_batch:
             self.send_batch()
             return True
@@ -67,13 +69,17 @@ class LogsHandler:
 
     def send_batch(self):
         self.last_sent_time = datetime.now()
+        sorted_logs = sorted(self.pending_logs, key=lambda r: r.log_time)
+        self.pending_logs.clear()
         subclasses = LogsHandler.__subclasses__()
         get_logger().debug(f"Send logs to handlers: {[c.__name__ for c in subclasses]}")
         for cls in subclasses:
             try:
-                cls.handle_logs(self.pending_logs)
+                cls.handle_logs(sorted_logs)
             except Exception:
-                get_logger().exception(f"Exception while handling {cls.__name__}", exc_info=True)
+                get_logger().exception(
+                    f"Exception while handling {cls.__name__}", exc_info=True
+                )
             else:
                 get_logger().debug(f"{cls.__name__} finished successfully")
 

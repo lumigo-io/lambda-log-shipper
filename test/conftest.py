@@ -1,6 +1,8 @@
 import logging
 import pytest
 
+from lambda_log_shipper.handlers.base_handler import LogRecord
+
 
 @pytest.fixture(autouse=True)
 def log_all(caplog):
@@ -14,4 +16,13 @@ def extension_env(monkeypatch):
 
 @pytest.fixture
 def raw_record():
-    return {'time': '2020-11-02T12:02:04.575Z', 'type': 'platform.start', 'record': {'requestId': '1-2-3-4', 'version': '$LATEST'}}
+    return {
+        "time": "2020-11-02T12:02:04.575Z",
+        "type": "platform.start",
+        "record": {"requestId": "1-2-3-4", "version": "$LATEST"},
+    }
+
+
+@pytest.fixture
+def record(raw_record):
+    return LogRecord.parse(raw_record)

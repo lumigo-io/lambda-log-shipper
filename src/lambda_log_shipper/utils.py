@@ -6,8 +6,8 @@ _logger = None
 
 LOG_SUBSCRIBER_PORT = 1060
 LUMIGO_EXTENSION_NAME = "logs"
-HEADERS_ID_KEY = 'Lambda-Extension-Identifier'
-HEADERS_NAME_KEY = 'Lambda-Extension-Name'
+HEADERS_ID_KEY = "Lambda-Extension-Identifier"
+HEADERS_NAME_KEY = "Lambda-Extension-Name"
 
 
 def get_logger():

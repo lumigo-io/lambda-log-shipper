@@ -3,8 +3,13 @@ import json
 import urllib.request
 
 from lambda_log_shipper.logs_subscriber import wait_for_logs, subscribe_to_logs
-from lambda_log_shipper.utils import get_logger, lambda_service, LUMIGO_EXTENSION_NAME, HEADERS_NAME_KEY, \
-    HEADERS_ID_KEY
+from lambda_log_shipper.utils import (
+    get_logger,
+    lambda_service,
+    LUMIGO_EXTENSION_NAME,
+    HEADERS_NAME_KEY,
+    HEADERS_ID_KEY,
+)
 
 
 EVENTS = ["INVOKE", "SHUTDOWN"]
@@ -23,12 +28,14 @@ def register_extension() -> str:
 
 
 def extension_loop(extension_id):
-    url = f"http://{os.environ['AWS_LAMBDA_RUNTIME_API']}/2020-01-01/extension/event/next"
+    url = (
+        f"http://{os.environ['AWS_LAMBDA_RUNTIME_API']}/2020-01-01/extension/event/next"
+    )
     req = urllib.request.Request(url, headers={HEADERS_ID_KEY: extension_id})
     while True:
         event = json.loads(urllib.request.urlopen(req).read())
         get_logger().debug(f"Extension got event {event}")
-        wait_for_logs(event["deadlineMs"])  # TODO: currently AWS have bug with this time
+        wait_for_logs(event["deadlineMs"])  # TODO: AWS have bug with this key
         if event.get("eventType") == "SHUTDOWN":
             break
 

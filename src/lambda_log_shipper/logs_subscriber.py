@@ -5,7 +5,12 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 from lambda_log_shipper.handlers.base_handler import LogsHandler
-from lambda_log_shipper.utils import LOG_SUBSCRIBER_PORT, HEADERS_ID_KEY, lambda_service, get_logger
+from lambda_log_shipper.utils import (
+    LOG_SUBSCRIBER_PORT,
+    HEADERS_ID_KEY,
+    lambda_service,
+    get_logger,
+)
 
 
 _logs_arrived = Event()
@@ -30,19 +35,21 @@ def wait_for_logs(max_finish_time: float):
 
 
 def subscribe_to_logs(extension_id):
-    server = HTTPServer(('0.0.0.0', LOG_SUBSCRIBER_PORT), LogsHttpRequestHandler)
+    server = HTTPServer(("0.0.0.0", LOG_SUBSCRIBER_PORT), LogsHttpRequestHandler)
     server.server_activate()
     ThreadPoolExecutor().submit(server.serve_forever)
 
     body = json.dumps(LOG_SUBSCRIPTION_REQUEST)
     conn = lambda_service()
-    conn.request("PUT", "/2020-08-15/logs", body, headers={HEADERS_ID_KEY: extension_id})
+    conn.request(
+        "PUT", "/2020-08-15/logs", body, headers={HEADERS_ID_KEY: extension_id}
+    )
 
 
 class LogsHttpRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
-            size = int(self.headers.get('Content-Length', '0'))
+            size = int(self.headers.get("Content-Length", "0"))
             records = json.loads(self.rfile.read(size))
             get_logger().info(records)
             LogsHandler.get_handler().add_records(records)
@@ -50,7 +57,9 @@ class LogsHttpRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             _logs_arrived.set()
         except Exception:
-            get_logger().exception("Exception during handling logs records", exc_info=True)
+            get_logger().exception(
+                "Exception during handling logs records", exc_info=True
+            )
 
     def log_message(self, *args):
         # Do not write console logs per request
