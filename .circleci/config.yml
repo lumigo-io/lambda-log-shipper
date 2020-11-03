@@ -1,0 +1,65 @@
+version: 2.1
+defaults: &defaults
+  working_directory: ~/lambda-log-shipper
+  docker:
+  - image: lumigo/ci:latest
+    auth:
+      username: lumigo
+      password: $DOCKERHUB_PASSWORD
+    environment:
+      USER: CI_USER
+      AWS_ACCESS_KEY_ID: MOCK
+      AWS_SECRET_ACCESS_KEY: MOCK
+
+commands:
+  checkout_code:
+    description: "Checkout code and test it"
+    steps:
+      - checkout
+      - run:
+            # Avoid annoying double runs after deploy.
+            # See https://discuss.circleci.com/t/job-runs-even-when-tags-ignore-filter-is-triggered-when-combined-with-branches-only/20664
+            name: Check if tagged
+            command: |
+              tags=$(git tag -l --points-at HEAD)
+              echo "Tags $tags"
+              if [[ ! -z "$tags" ]]
+              then
+                echo "A tagged commit, skip..."
+                circleci step halt
+              fi
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            python setup.py develop
+
+
+workflows:
+  test-deploy:
+    jobs:
+    - test
+    - deploy:
+        requires:
+        - test
+        filters:
+          branches:
+            only: master
+
+jobs:
+  test:
+    <<: *defaults
+    resource_class: small
+    steps:
+      - checkout_code
+      - run: . venv/bin/activate && ./scripts/checks.sh
+      - run: bash <(curl -s https://codecov.io/bash)
+
+
+  deploy:
+    <<: *defaults
+    resource_class: small
+    steps:
+      - checkout_code
+      - run: ./scripts/deploy.sh
