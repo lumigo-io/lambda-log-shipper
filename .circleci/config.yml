@@ -34,7 +34,6 @@ commands:
             python3 -m venv venv
             . venv/bin/activate
             python setup.py develop
-            pip install pytest
 
 
 workflows:
@@ -54,7 +53,7 @@ jobs:
     resource_class: small
     steps:
       - checkout_code
-      - run: ./scripts/checks.sh
+      - run: . venv/bin/activate && ./scripts/checks.sh
       - run: bash <(curl -s https://codecov.io/bash)
 
 
