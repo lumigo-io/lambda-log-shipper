@@ -11,7 +11,7 @@ from lambda_log_shipper.utils import get_logger
 class S3Handler(LogsHandler):
     def handle_logs(self, records: List[LogRecord]) -> bool:
         if Configuration.s3_bucket_arn and records:
-            get_logger().debug(f"S3Handler started to run")
+            get_logger().debug("S3Handler started to run")
             s3 = boto3.client("s3")
             key = S3Handler.generate_key_name(records)
             file_data = S3Handler.format_records(records)
@@ -28,5 +28,5 @@ class S3Handler(LogsHandler):
     @staticmethod
     def format_records(records: List[LogRecord]) -> bytes:
         return "\n".join(
-            f"{r.log_time.isoformat()}-{r.record}" for r in records
+            f"{r.log_time.isoformat()}-{r.log_type.value}-{r.record}" for r in records
         ).encode()

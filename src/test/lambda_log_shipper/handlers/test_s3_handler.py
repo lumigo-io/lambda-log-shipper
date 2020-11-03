@@ -23,11 +23,13 @@ def test_generate_key_name(record):
 def test_format_records(record):
     t1 = datetime.datetime(2020, 5, 22, 10, 20, 30)
     r1 = LogRecord(log_type=LogType.START, log_time=t1, record="a")
-    r2 = LogRecord(log_type=LogType.START, log_time=t1, record="b")
+    r2 = LogRecord(log_type=LogType.FUNCTION, log_time=t1, record="b")
 
     data = S3Handler.format_records([r1, r2])
 
-    assert data.decode() == "2020-05-22T10:20:30-a\n2020-05-22T10:20:30-b"
+    assert (
+        data.decode() == "2020-05-22T10:20:30-START-a\n2020-05-22T10:20:30-FUNCTION-b"
+    )
 
 
 @mock_s3
@@ -39,13 +41,13 @@ def test_handle_logs_happy_flow(record, monkeypatch):
     t1 = datetime.datetime(2020, 5, 22, 10, 20, 30)
     r1 = LogRecord(log_type=LogType.START, log_time=t1, record="a")
 
-    assert S3Handler.handle_logs([r1])
+    assert S3Handler().handle_logs([r1])
 
     key_name = s3.list_objects(Bucket=Configuration.s3_bucket_arn)["Contents"][0]["Key"]
     obj = s3.get_object(Key=key_name, Bucket=Configuration.s3_bucket_arn)
-    assert obj["Body"].read().decode() == "2020-05-22T10:20:30-a"
+    assert obj["Body"].read().decode() == "2020-05-22T10:20:30-START-a"
 
 
 @mock_s3
 def test_handle_logs_no_config(monkeypatch, record):
-    assert not S3Handler.handle_logs([record])  # no exception
+    assert not S3Handler().handle_logs([record])  # no exception
