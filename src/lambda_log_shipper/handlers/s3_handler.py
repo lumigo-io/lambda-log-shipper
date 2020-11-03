@@ -23,7 +23,7 @@ class S3Handler(LogsHandler):
     @staticmethod
     def generate_key_name(records: List[LogRecord]):
         t = min(r.log_time for r in records)
-        return f"logs/{t.year}/{t.month}/{t.day}/{t.hour}/{t.minute}:{t.second}-{random.random()}"
+        return f"logs/{t.year}/{t.month}/{t.day}/{t.hour}/{t.minute}:{t.second}:{t.microsecond}-{random.random()}"
 
     @staticmethod
     def format_records(records: List[LogRecord]) -> bytes:

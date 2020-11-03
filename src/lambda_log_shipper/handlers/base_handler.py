@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 from datetime import datetime
 from dataclasses import dataclass
@@ -8,24 +9,24 @@ from lambda_log_shipper.utils import get_logger
 
 
 class LogType(Enum):
-    start = "start"
-    end = "end"
-    report = "report"
-    function = "function"
-    extension = "extension"
+    START = "START"
+    END = "END"
+    REPORT = "REPORT"
+    FUNCTION = "FUNCTION"
+    EXTENSION = "EXTENSION"
 
     @staticmethod
     def parse(record_type):
         if record_type == "platform.start":
-            return LogType.start
+            return LogType.START
         elif record_type == "platform.end":
-            return LogType.end
+            return LogType.END
         elif record_type == "platform.report":
-            return LogType.report
+            return LogType.REPORT
         elif record_type == "function":
-            return LogType.function
+            return LogType.FUNCTION
         elif record_type in ("platform.logsSubscription", "platform.extension"):
-            return LogType.extension
+            return LogType.EXTENSION
         raise ValueError("Unknown record type")
 
 
@@ -33,14 +34,14 @@ class LogType(Enum):
 class LogRecord:
     log_type: LogType
     log_time: datetime
-    record: Union[str, Dict]
+    record: str
 
     @staticmethod
-    def parse(record) -> "LogRecord":
+    def parse(record: Dict[str, str]) -> "LogRecord":
         return LogRecord(
             log_type=LogType.parse(record["type"]),
             log_time=datetime.fromisoformat(record["time"][:-1]),
-            record=record["record"],
+            record=json.dumps(record["record"]),
         )
 
 

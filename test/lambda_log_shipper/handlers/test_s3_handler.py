@@ -23,8 +23,8 @@ def test_generate_key_name(record):
 
 def test_format_records(record):
     t1 = datetime.datetime(2020, 5, 22, 10, 20, 30)
-    r1 = LogRecord(log_type=LogType.start, log_time=t1, record="a")
-    r2 = LogRecord(log_type=LogType.start, log_time=t1, record="b")
+    r1 = LogRecord(log_type=LogType.START, log_time=t1, record="a")
+    r2 = LogRecord(log_type=LogType.START, log_time=t1, record="b")
 
     data = S3Handler.format_records([r1, r2])
 
@@ -38,7 +38,7 @@ def test_handle_logs_happy_flow(record, monkeypatch):
     s3.create_bucket(Bucket="123")
 
     t1 = datetime.datetime(2020, 5, 22, 10, 20, 30)
-    r1 = LogRecord(log_type=LogType.start, log_time=t1, record="a")
+    r1 = LogRecord(log_type=LogType.START, log_time=t1, record="a")
 
     assert S3Handler.handle_logs([r1])
 

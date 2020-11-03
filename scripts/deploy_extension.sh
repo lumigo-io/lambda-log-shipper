@@ -18,7 +18,7 @@ echo "-zipping"
 zip -qr "extensions.zip" "extensions" "extension-python-modules" "python-runtime" "preview-extensions-ggqizro707"
 echo "-publish"
 version=$(aws lambda publish-layer-version --layer-name "logs-extension" --zip-file fileb://extensions.zip --region "us-east-1" | jq -r '.LayerVersionArn')
-rm -rf extensions extension-python-modules extensions.zip runtime.zip python-runtime __MACOSX
+rm -rf extensions extension-python-modules extensions.zip runtime.zip python-runtime __MACOSX preview-extensions-ggqizro707
 popd > /dev/null || exit
 
 echo "\nDone.\n"
