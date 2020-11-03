@@ -20,6 +20,11 @@ def test_log_type_parse(record_type, expected):
     assert LogType.parse(record_type) == expected
 
 
+def test_log_type_parse_unknown():
+    with pytest.raises(ValueError):
+        LogType.parse("other")
+
+
 def test_log_record_parse(raw_record):
     record = LogRecord.parse(raw_record)
     assert record.log_type == LogType.START

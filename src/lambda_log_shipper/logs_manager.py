@@ -38,7 +38,7 @@ class LogsManager:
         get_logger().debug(f"Send logs to handlers: {[c.__name__ for c in subclasses]}")
         for cls in subclasses:
             try:
-                cls().handle_logs(sorted_logs)
+                cls().handle_logs(sorted_logs)  # type: ignore
             except Exception:
                 get_logger().exception(
                     f"Exception while handling {cls.__name__}", exc_info=True

@@ -1,3 +1,4 @@
+import pytest
 import time
 import http
 import json
@@ -11,8 +12,22 @@ from lambda_log_shipper.logs_subscriber import (
     subscribe_to_logs,
     LogsHttpRequestHandler,
 )
-from lambda_log_shipper.handlers.base_handler import LogsHandler, LogRecord
+from lambda_log_shipper.handlers.base_handler import LogRecord
 from lambda_log_shipper.logs_manager import LogsManager
+
+
+@pytest.fixture
+def logs_server_mock(monkeypatch):
+    class MockRequest:
+        def makefile(self, *args, **kwargs):
+            return BytesIO(b"POST /")
+
+        def sendall(self, _):
+            pass
+
+    handler = LogsHttpRequestHandler(MockRequest(), ("0.0.0.0", 8888), Mock())
+    monkeypatch.setattr(handler, "headers", {"Content-Length": "1000"}, False)
+    return handler
 
 
 def test_wait_for_logs_avoiding_timeout(monkeypatch, caplog):
@@ -46,19 +61,20 @@ def test_subscribe_to_logs(monkeypatch):
     )
 
 
-def test_do_POST(monkeypatch, raw_record):
-    class MockRequest:
-        def makefile(self, *args, **kwargs):
-            return BytesIO(b"POST /")
-
-        def sendall(self, _):
-            pass
-
-    handler = LogsHttpRequestHandler(MockRequest(), ("0.0.0.0", 8888), Mock())
-    monkeypatch.setattr(handler, "headers", {"Content-Length": "1000"}, False)
+def test_do_POST_happy_flow(logs_server_mock, monkeypatch, raw_record):
     monkeypatch.setattr(
-        handler, "rfile", BytesIO(b"[" + json.dumps(raw_record).encode() + b"]"), False
+        logs_server_mock,
+        "rfile",
+        BytesIO(b"[" + json.dumps(raw_record).encode() + b"]"),
+        False,
     )
-    handler.do_POST()
+    logs_server_mock.do_POST()
 
     assert LogsManager.get_manager().pending_logs == [LogRecord.parse(raw_record)]
+
+
+def test_do_POST_exception(logs_server_mock, monkeypatch, raw_record, caplog):
+    monkeypatch.setattr(logs_server_mock, "rfile", BytesIO(b"no json"), False)
+    logs_server_mock.do_POST()
+
+    assert caplog.records[-1].exc_info[0].__name__ == "JSONDecodeError"

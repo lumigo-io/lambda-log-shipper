@@ -1,5 +1,3 @@
-import os
-
 import setuptools
 
 setuptools.setup(
@@ -12,7 +10,7 @@ setuptools.setup(
     url="https://github.com/lumigo-io/lambda-log-shipper.git",
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
-    install_requires=["pytest", "boto3", "moto"],
+    install_requires=["pytest", "boto3", "moto", "pytest-cov"],
     license="Apache License 2.0",
     classifiers=[
         "Programming Language :: Python :: 3",

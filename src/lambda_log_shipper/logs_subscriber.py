@@ -10,6 +10,7 @@ from lambda_log_shipper.utils import (
     HEADERS_ID_KEY,
     lambda_service,
     get_logger,
+    never_fail,
 )
 
 
@@ -48,18 +49,14 @@ def subscribe_to_logs(extension_id):
 
 class LogsHttpRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
-        try:
+        with never_fail("parse logs event"):
             size = int(self.headers.get("Content-Length", "0"))
             records = json.loads(self.rfile.read(size))
             get_logger().info(records)
             LogsManager.get_manager().add_records(records)
-            self.send_response(200)
-            self.end_headers()
-            _logs_arrived.set()
-        except Exception:
-            get_logger().exception(
-                "Exception during handling logs records", exc_info=True
-            )
+        self.send_response(200)
+        self.end_headers()
+        _logs_arrived.set()
 
     def log_message(self, *args):
         # Do not write console logs per request

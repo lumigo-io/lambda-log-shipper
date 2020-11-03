@@ -1,12 +1,11 @@
-import logging
 import pytest
 
 from lambda_log_shipper.handlers.base_handler import LogRecord
 
 
 @pytest.fixture(autouse=True)
-def log_all(caplog):
-    caplog.set_level(logging.DEBUG)
+def log_all(monkeypatch, caplog):
+    monkeypatch.setenv("LOG_SHIPPER_DEBUG", "true")
 
 
 @pytest.fixture(autouse=True)

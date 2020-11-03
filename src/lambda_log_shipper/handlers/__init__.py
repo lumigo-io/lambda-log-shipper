@@ -1,1 +1,1 @@
-from . import s3_handler
+from . import s3_handler  # noqa: F401
