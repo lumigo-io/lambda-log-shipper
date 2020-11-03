@@ -7,6 +7,9 @@ from lambda_log_shipper.handlers.base_handler import LogsHandler, LogRecord
 from lambda_log_shipper.configuration import Configuration
 from lambda_log_shipper.utils import get_logger
 
+TIME_PADDING = 30
+TYPE_PADDING = 10
+
 
 class S3Handler(LogsHandler):
     def handle_logs(self, records: List[LogRecord]) -> bool:
@@ -27,6 +30,8 @@ class S3Handler(LogsHandler):
 
     @staticmethod
     def format_records(records: List[LogRecord]) -> bytes:
-        return "\n".join(
-            f"{r.log_time.isoformat()}-{r.log_type.value}-{r.record}" for r in records
-        ).encode()
+        return "\n".join(map(S3Handler._format_record, records)).encode()
+
+    @staticmethod
+    def _format_record(r: LogRecord):
+        return f"{r.log_time.isoformat():{TIME_PADDING}}{r.log_type.value:{TYPE_PADDING}}{r.record}"
