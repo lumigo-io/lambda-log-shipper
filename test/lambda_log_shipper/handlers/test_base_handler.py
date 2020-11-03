@@ -28,13 +28,15 @@ def test_log_record_parse(raw_record):
     assert record.log_time == datetime(2020, 11, 2, 12, 2, 4, 575000)
 
 
-def test_send_batch_some_failures(caplog):
+def test_send_batch_some_failures(caplog, record):
     class TestHandler(LogsHandler):
         @staticmethod
         def handle_logs(records):
             1 / 0
 
-    LogsHandler().send_batch()  # No exception
+    handler = LogsHandler()
+    handler.pending_logs.append(record)
+    handler.send_batch()  # No exception
 
     assert len([r for r in caplog.records if r.levelname == "ERROR"]) == 1
     assert [r for r in caplog.records if r.levelname == "DEBUG"]
@@ -51,3 +53,7 @@ def test_add_records_big_batch(raw_record):
 def test_add_records_old_batch(raw_record, monkeypatch):
     monkeypatch.setattr(Configuration, "min_batch_time", -1)
     assert LogsHandler().add_records([raw_record])
+
+
+def test_send_batch_empty():
+    assert not LogsHandler().send_batch()

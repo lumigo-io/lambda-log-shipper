@@ -1,6 +1,7 @@
 import os
 import http
 import logging
+from contextlib import contextmanager
 
 _logger = None
 
@@ -24,3 +25,13 @@ def get_logger():
 
 def lambda_service():
     return http.client.HTTPConnection(os.environ["AWS_LAMBDA_RUNTIME_API"])
+
+
+@contextmanager
+def never_fail(part_name: str = ""):
+    try:
+        yield
+    except Exception as e:
+        get_logger().exception(
+            f"An exception occurred in a never-fail code '{part_name}'", exc_info=e
+        )

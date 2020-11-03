@@ -51,6 +51,7 @@ class LogsHandler:
     def __init__(self):
         self.last_sent_time: datetime = datetime.now()
         self.pending_logs: List[LogRecord] = []
+        self.pending_logs_size: int = 0
 
     @staticmethod
     def handle_logs(records: List[LogRecord]):
@@ -59,7 +60,8 @@ class LogsHandler:
     def add_records(self, raw_records: List[dict]) -> bool:
         new_records = [LogRecord.parse(r) for r in raw_records]
         self.pending_logs.extend(new_records)
-        big_batch = len(self.pending_logs) >= Configuration.min_batch_size
+        self.pending_logs_size += sum((len(r.record) for r in new_records), 0)
+        big_batch = self.pending_logs_size >= Configuration.min_batch_size
         old_batch = (
             datetime.now() - self.last_sent_time
         ).total_seconds() >= Configuration.min_batch_time
@@ -68,10 +70,13 @@ class LogsHandler:
             return True
         return False
 
-    def send_batch(self):
+    def send_batch(self) -> bool:
         self.last_sent_time = datetime.now()
+        if not self.pending_logs:
+            return False
         sorted_logs = sorted(self.pending_logs, key=lambda r: r.log_time)
         self.pending_logs.clear()
+        self.pending_logs_size = 0
         subclasses = LogsHandler.__subclasses__()
         get_logger().debug(f"Send logs to handlers: {[c.__name__ for c in subclasses]}")
         for cls in subclasses:
@@ -83,6 +88,7 @@ class LogsHandler:
                 )
             else:
                 get_logger().debug(f"{cls.__name__} finished successfully")
+        return True
 
     @staticmethod
     def get_handler():

@@ -2,6 +2,7 @@ import os
 import json
 import urllib.request
 
+from lambda_log_shipper.handlers.base_handler import LogsHandler
 from lambda_log_shipper.logs_subscriber import wait_for_logs, subscribe_to_logs
 from lambda_log_shipper.utils import (
     get_logger,
@@ -9,6 +10,7 @@ from lambda_log_shipper.utils import (
     LUMIGO_EXTENSION_NAME,
     HEADERS_NAME_KEY,
     HEADERS_ID_KEY,
+    never_fail,
 )
 
 
@@ -34,9 +36,12 @@ def extension_loop(extension_id):
     req = urllib.request.Request(url, headers={HEADERS_ID_KEY: extension_id})
     while True:
         event = json.loads(urllib.request.urlopen(req).read())
-        get_logger().debug(f"Extension got event {event}")
-        wait_for_logs(event["deadlineMs"])  # TODO: AWS have bug with this key
+        with never_fail("wait for logs"):
+            get_logger().debug(f"Extension got event {event}")
+            wait_for_logs(event["deadlineMs"])  # TODO: AWS have bug with this key
         if event.get("eventType") == "SHUTDOWN":
+            with never_fail("send final batch"):
+                LogsHandler.get_handler().send_batch()
             break
 
 
