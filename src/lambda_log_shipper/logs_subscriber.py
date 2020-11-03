@@ -1,10 +1,10 @@
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from concurrent.futures.thread import ThreadPoolExecutor
+from threading import Event
 import json
 import time
-from threading import Event
-from concurrent.futures.thread import ThreadPoolExecutor
-from http.server import HTTPServer, BaseHTTPRequestHandler
 
-from lambda_log_shipper.handlers.base_handler import LogsHandler
+from lambda_log_shipper.logs_manager import LogsManager
 from lambda_log_shipper.utils import (
     LOG_SUBSCRIBER_PORT,
     HEADERS_ID_KEY,
@@ -52,7 +52,7 @@ class LogsHttpRequestHandler(BaseHTTPRequestHandler):
             size = int(self.headers.get("Content-Length", "0"))
             records = json.loads(self.rfile.read(size))
             get_logger().info(records)
-            LogsHandler.get_handler().add_records(records)
+            LogsManager.get_manager().add_records(records)
             self.send_response(200)
             self.end_headers()
             _logs_arrived.set()

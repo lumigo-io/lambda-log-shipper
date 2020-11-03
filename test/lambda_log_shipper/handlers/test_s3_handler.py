@@ -1,13 +1,12 @@
 from dataclasses import asdict
-
-import boto3
 import datetime
 
 from moto import mock_s3
+import boto3
 
-from lambda_log_shipper.configuration import Configuration
 from lambda_log_shipper.handlers.base_handler import LogRecord, LogType
 from lambda_log_shipper.handlers.s3_handler import S3Handler
+from lambda_log_shipper.configuration import Configuration
 
 
 def test_generate_key_name(record):
@@ -18,7 +17,7 @@ def test_generate_key_name(record):
 
     key = S3Handler.generate_key_name([r1, r2])
 
-    assert key.startswith("logs/2020/5/22/10/20:30-")
+    assert key.startswith("logs/2020/5/22/10/20:30:0-")
 
 
 def test_format_records(record):

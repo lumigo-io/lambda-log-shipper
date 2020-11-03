@@ -12,6 +12,7 @@ from lambda_log_shipper.logs_subscriber import (
     LogsHttpRequestHandler,
 )
 from lambda_log_shipper.handlers.base_handler import LogsHandler, LogRecord
+from lambda_log_shipper.logs_manager import LogsManager
 
 
 def test_wait_for_logs_avoiding_timeout(monkeypatch, caplog):
@@ -60,4 +61,4 @@ def test_do_POST(monkeypatch, raw_record):
     )
     handler.do_POST()
 
-    assert LogsHandler.get_handler().pending_logs == [LogRecord.parse(raw_record)]
+    assert LogsManager.get_manager().pending_logs == [LogRecord.parse(raw_record)]

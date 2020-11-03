@@ -1,10 +1,10 @@
-import random
 from typing import List
+import random
 
 import boto3
 
-from lambda_log_shipper.configuration import Configuration
 from lambda_log_shipper.handlers.base_handler import LogsHandler, LogRecord
+from lambda_log_shipper.configuration import Configuration
 from lambda_log_shipper.utils import get_logger
 
 
