@@ -1,5 +1,6 @@
 from typing import List
 import random
+import os
 
 import boto3
 
@@ -25,8 +26,10 @@ class S3Handler(LogsHandler):
 
     @staticmethod
     def generate_key_name(records: List[LogRecord]):
+        lambda_name = os.environ.get("AWS_LAMBDA_FUNCTION_NAME", "unknown")
         t = min(r.log_time for r in records)
-        return f"logs/{t.year}/{t.month}/{t.day}/{t.hour}/{t.minute}:{t.second}:{t.microsecond}-{random.random()}"
+        directory = f"logs/{t.year}/{t.month}/{t.day}/{t.hour}/{lambda_name}/"
+        return f"{directory}{t.minute}:{t.second}:{t.microsecond}-{random.random()}"
 
     @staticmethod
     def format_records(records: List[LogRecord]) -> bytes:

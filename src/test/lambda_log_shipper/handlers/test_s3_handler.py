@@ -1,5 +1,6 @@
 from dataclasses import asdict
 import datetime
+import pytest
 
 from moto import mock_s3
 import boto3
@@ -7,6 +8,11 @@ import boto3
 from lambda_log_shipper.handlers.base_handler import LogRecord, LogType
 from lambda_log_shipper.handlers.s3_handler import S3Handler
 from lambda_log_shipper.configuration import Configuration
+
+
+@pytest.fixture(autouse=True)
+def lambda_name(monkeypatch):
+    monkeypatch.setenv("AWS_LAMBDA_FUNCTION_NAME", "func")
 
 
 def test_generate_key_name(record):
@@ -17,7 +23,7 @@ def test_generate_key_name(record):
 
     key = S3Handler.generate_key_name([r1, r2])
 
-    assert key.startswith("logs/2020/5/22/10/20:30:0-")
+    assert key.startswith("logs/2020/5/22/10/func/20:30:0-")
 
 
 def test_format_records(record):
@@ -33,9 +39,11 @@ def test_format_records(record):
 
 @mock_s3
 def test_handle_logs_happy_flow(record, monkeypatch):
-    s3 = boto3.client("s3")
+    s3 = boto3.client("s3", region_name="us-west-2")
     monkeypatch.setattr(Configuration, "s3_bucket_arn", "123")
-    s3.create_bucket(Bucket="123")
+    s3.create_bucket(
+        Bucket="123", CreateBucketConfiguration={"LocationConstraint": "us-west-2"}
+    )
 
     t1 = datetime.datetime(2020, 5, 22, 10, 20, 30, 123456)
     r1 = LogRecord(log_type=LogType.START, log_time=t1, record="a")
