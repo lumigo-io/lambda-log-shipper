@@ -15,7 +15,7 @@
 
 ## Usage
 
-Add the layer to your lambda ([read how](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html#configuration-layers-using)):
+Add the layer to your lambda ([read how](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html#configuration-layers-using)): <br />
 `LAYER_ARN=arn:aws:lambda:<REGION>>:114300393969:layer:logs-extension:1`.
 
 Choose a shipping method:
