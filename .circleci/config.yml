@@ -54,7 +54,7 @@ jobs:
     steps:
       - checkout_code
       - run: . venv/bin/activate && ./scripts/checks.sh
-      - run: bash <(curl -s https://codecov.io/bash)
+      - run: cd src/lambda_log_shipper && bash <(curl -s https://codecov.io/bash)
 
 
   deploy:
