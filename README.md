@@ -2,9 +2,7 @@
  <img width="20%" height="20%" src="./logo.svg">
 </p>
 
-# Lambda-Log-Shipper
-
-Ship your AWS lambda logs anywhere. The no-code style.
+> Ship your AWS lambda logs anywhere. The no-code style.
 
 
 [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)]()
@@ -17,24 +15,26 @@ Ship your AWS lambda logs anywhere. The no-code style.
 
 ## Usage
 
-Add the [latest extension](https://github.com/lumigo-io/lambda-log-shipper/LAYERS.txt) to your lambda ([read how](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html#configuration-layers-using)).
+Add the layer to your lambda ([read how](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html#configuration-layers-using)):
+`LAYER_ARN=arn:aws:lambda:<REGION>>:114300393969:layer:logs-extension:1`.
 
 Choose a shipping method:
 * S3 - Set the environment variable `LUMIGO_EXTENSION_LOG_S3_BUCKET` to your target bucket. Don't forget to add proper permissions.
-* <Your next service / 3rd party method>
+
+Please contribute or open us a ticket for more integrations.
 
 
 ## Advanced Configuration
 
 (Optional) Choose shipping parameters:
-* `LUMIGO_EXTENSION_LOG_BATCH_SIZE` indicates the target size (in bytes) of each log file. We will aggregate logs to at least this size before shipping.
-* `LUMIGO_EXTENSION_LOG_BATCH_TIME` indicates the target time (in milliseconds) before closing a log file. We will aggregate logs for at least this period before shipping.
+* `LUMIGO_EXTENSION_LOG_BATCH_SIZE` (default `1000`) indicates the target size (in bytes) of each log file. We will aggregate logs to at least this size before shipping.
+* `LUMIGO_EXTENSION_LOG_BATCH_TIME` (default `60000`) indicates the target time (in milliseconds) before closing a log file. We will aggregate logs for at least this period before shipping.
 
 Note: We will ship the logs immediately when the container is shutting down. Therefore, log files can be smaller and more frequent than the above configuration.
 
 ## How it works
 
-We use the new extensions ([read more](https://lumigo.io/blog/aws-lambda-extensions-what-are-they-and-why-do-they-matter/)) feature to trigger a new process that handles your logs.
+We use the [new extensions feature](https://lumigo.io/blog/aws-lambda-extensions-what-are-they-and-why-do-they-matter/) to trigger a new process that handles your logs.
 This process is triggered by the LambdaService with the lambda's logs, which being aggregated in-memory and transferred to your chosen shipping method.
 
 ## Contribute
