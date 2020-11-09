@@ -4,11 +4,10 @@
 
 # Lambda-Log-Shipper
 
-Ship your AWS lambda logs. The no-code style.
+Ship your AWS lambda logs anywhere. The no-code style.
 
 
 [![MIT](https://img.shields.io/packagist/l/doctrine/orm.svg?style=flat-square)]()
-[![PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)]()
 [![codecov](https://codecov.io/gh/lumigo-io/lambda-log-shipper/branch/main/graph/badge.svg?token=3Sv1vOyN8W)](https://codecov.io/gh/lumigo-io/lambda-log-shipper)
 
 - [Usage](#usage)
