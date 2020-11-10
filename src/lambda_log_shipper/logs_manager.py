@@ -19,7 +19,7 @@ class LogsManager:
         self.pending_logs.extend(new_records)
         self.pending_logs_size += sum((len(r.record) for r in new_records), 0)
 
-    def send_batch_if_needed(self):
+    def send_batch_if_needed(self) -> bool:
         big_batch = self.pending_logs_size >= Configuration.min_batch_size
         old_batch = (
             datetime.now() - self.last_sent_time
