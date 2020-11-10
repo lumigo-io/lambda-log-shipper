@@ -30,7 +30,7 @@ regions=("ap-northeast-1" "ap-northeast-2" "ap-south-1" "ap-southeast-1" "ap-sou
 layer_name="lambda-log-shipper"
 for region in "${regions[@]}"; do
     version=$(aws lambda publish-layer-version --layer-name "${layer_name}" --description "No-code to ship your logs" --zip-file fileb://extensions.zip --region ${region} --cli-connect-timeout 6000 | jq -r '.Version')
-    aws lambda add-layer-version-permission --layer-name "${layer_name}" --statement-id engineering-org --principal "*" --action lambda:GetLayerVersion --version-number ${version} --region ${region}
+    aws lambda add-layer-version-permission --layer-name "${layer_name}" --statement-id engineering-org --principal "*" --action lambda:GetLayerVersion --version-number ${version} --region ${region} > /dev/null
     echo "published layer version: ${version} in region: ${region}"
 done
 rm -rf extensions extension-python-modules extensions.zip runtime.zip python-runtime __MACOSX preview-extensions-ggqizro707
@@ -38,10 +38,9 @@ popd > /dev/null || exit
 
 
 echo "-update README"
-arn="arn:aws:lambda:<region>:114300393969:layer:logs-extension:${version}"
-sed -i -E "s/\(LAYER_ARN=\)[a-z0-9:-]*/\1${arn}/" README.md
+sed -i -E "s/\(arn:aws:lambda:<region>:114300393969:layer:logs-extension:\)[0-9]*/\1${version}/" README.md
 
 
 echo
-echo "Done! Latest ARN: ${version}"
+echo "Done! Latest version: ${version}"
 echo
