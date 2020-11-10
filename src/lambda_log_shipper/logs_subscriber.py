@@ -1,8 +1,6 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from concurrent.futures.thread import ThreadPoolExecutor
-from threading import Event
 import json
-import time
 
 from lambda_log_shipper.logs_manager import LogsManager
 from lambda_log_shipper.utils import (
@@ -14,8 +12,6 @@ from lambda_log_shipper.utils import (
 )
 
 
-_logs_arrived = Event()
-
 LOG_SUBSCRIPTION_REQUEST = {
     "destination": {
         "protocol": "HTTP",
@@ -24,15 +20,6 @@ LOG_SUBSCRIPTION_REQUEST = {
     "types": ["platform", "function"],
 }
 TIMEOUT_SAFETY_GAP = 0.5
-
-
-def wait_for_logs(max_finish_time: float):
-    _logs_arrived.clear()
-    seconds_to_finish = max_finish_time / 1000 - time.time() - TIMEOUT_SAFETY_GAP
-    _logs_arrived.wait(seconds_to_finish)
-    if not _logs_arrived.is_set():
-        get_logger().error("Skip waiting for logs to avoid timeout")
-    return
 
 
 def subscribe_to_logs(extension_id):
@@ -56,7 +43,6 @@ class LogsHttpRequestHandler(BaseHTTPRequestHandler):
             LogsManager.get_manager().add_records(records)
         self.send_response(200)
         self.end_headers()
-        _logs_arrived.set()
 
     def log_message(self, *args):
         # Do not write console logs per request

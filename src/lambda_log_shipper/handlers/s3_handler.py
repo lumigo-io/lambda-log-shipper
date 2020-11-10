@@ -20,7 +20,7 @@ class S3Handler(LogsHandler):
             key = S3Handler.generate_key_name(records)
             file_data = S3Handler.format_records(records)
             s3.put_object(Body=file_data, Bucket=Configuration.s3_bucket_arn, Key=key)
-            get_logger().debug(f"S3Handler put logs in {key}")
+            get_logger().info(f"S3Handler put logs in {key}")
             return True
         return False
 

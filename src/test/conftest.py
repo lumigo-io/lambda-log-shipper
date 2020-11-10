@@ -1,6 +1,7 @@
 import pytest
 
 from lambda_log_shipper.handlers.base_handler import LogRecord
+from lambda_log_shipper.logs_manager import LogsManager
 
 
 @pytest.fixture(autouse=True)
@@ -11,6 +12,11 @@ def log_all(monkeypatch, caplog):
 @pytest.fixture(autouse=True)
 def extension_env(monkeypatch):
     monkeypatch.setenv("AWS_LAMBDA_RUNTIME_API", "127.0.0.1")
+
+
+@pytest.fixture(autouse=True)
+def clear_logs_manager(monkeypatch):
+    LogsManager._singleton = None
 
 
 @pytest.fixture

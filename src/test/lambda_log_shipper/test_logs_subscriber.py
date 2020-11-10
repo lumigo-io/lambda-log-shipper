@@ -1,5 +1,4 @@
 import pytest
-import time
 import http
 import json
 from unittest.mock import Mock
@@ -7,8 +6,6 @@ from http.server import HTTPServer
 from io import BytesIO
 
 from lambda_log_shipper.logs_subscriber import (
-    wait_for_logs,
-    _logs_arrived,
     subscribe_to_logs,
     LogsHttpRequestHandler,
 )
@@ -28,20 +25,6 @@ def logs_server_mock(monkeypatch):
     handler = LogsHttpRequestHandler(MockRequest(), ("0.0.0.0", 8888), Mock())
     monkeypatch.setattr(handler, "headers", {"Content-Length": "1000"}, False)
     return handler
-
-
-def test_wait_for_logs_avoiding_timeout(monkeypatch, caplog):
-    monkeypatch.setattr(time, "time", lambda: 1900)
-    wait_for_logs(2000)
-    assert len([r for r in caplog.records if r.levelname == "ERROR"]) == 1
-
-
-def test_wait_for_logs_happy_flow(monkeypatch, caplog):
-    _logs_arrived.set()
-    monkeypatch.setattr(_logs_arrived, "wait", lambda _: None)
-    monkeypatch.setattr(_logs_arrived, "clear", lambda: None)
-    wait_for_logs(time.time() * 1000 + 5000)
-    assert not [r for r in caplog.records if r.levelname == "ERROR"]
 
 
 def test_subscribe_to_logs(monkeypatch):
