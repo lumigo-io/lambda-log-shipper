@@ -16,7 +16,7 @@
 ## Usage
 
 Add the layer to your lambda ([read how](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html#configuration-layers-using)): <br />
-`LAYER_ARN=arn:aws:lambda:<region>:114300393969:layer:lambda-log-shipper:1`.
+`LAYER_ARN=arn:aws:lambda:<region>:114300393969:layer:lumigo-log-shipper:1`.
 
 Choose a shipping method:
 * S3 - Set the environment variable `LUMIGO_EXTENSION_LOG_S3_BUCKET` to your target bucket. Don't forget to add proper permissions.
