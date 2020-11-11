@@ -27,7 +27,7 @@ zip -qr "extensions.zip" "extensions" "extension-python-modules" "python-runtime
 
 echo "-publish"
 regions=("ap-northeast-1" "ap-northeast-2" "ap-south-1" "ap-southeast-1" "ap-southeast-2" "ca-central-1" "eu-central-1" "eu-north-1" "eu-west-1" "eu-west-2" "eu-west-3" "sa-east-1" "us-east-1" "us-east-2" "us-west-1" "us-west-2" "ap-east-1" "me-south-1")
-layer_name="lumigo-log-shipper"
+layer_name="lambda-log-shipper"
 for region in "${regions[@]}"; do
     version=$(aws lambda publish-layer-version --layer-name "${layer_name}" --description "No-code to ship your logs" --zip-file fileb://extensions.zip --region ${region} --cli-connect-timeout 6000 | jq -r '.Version')
     aws lambda add-layer-version-permission --layer-name "${layer_name}" --statement-id engineering-org --principal "*" --action lambda:GetLayerVersion --version-number ${version} --region ${region} > /dev/null
