@@ -71,4 +71,3 @@ jobs:
       - checkout_code
       - checkout_credentials
       - run: ./scripts/deploy.sh
-      - run: git add README.md && git commit -m"update layer ARN in README" && git push origin main

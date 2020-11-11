@@ -44,7 +44,9 @@ popd > /dev/null || exit
 
 echo "-update README"
 sed -i "s/\(arn:aws:lambda:<region>:114300393969:layer:${layer_name}:\)[0-9]*/\1${version}/" README.md
-
+git add README.md || true
+git commit -m"update layer ARN in README [skip ci]" || true
+git push origin main || true
 
 echo
 echo "Done! Latest version: ${version}"
