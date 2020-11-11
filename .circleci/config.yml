@@ -12,6 +12,13 @@ defaults: &defaults
       AWS_SECRET_ACCESS_KEY: MOCK
 
 commands:
+  checkout_credentials:
+    description: "Checkout credentials"
+    steps:
+      - run:
+          command: |
+            cd ..
+            git clone git@github.com:lumigo-io/common-resources.git
   checkout_code:
     description: "Checkout code and test it"
     steps:
@@ -62,5 +69,6 @@ jobs:
     resource_class: small
     steps:
       - checkout_code
+      - checkout_credentials
       - run: ./scripts/deploy.sh
-      - run: git add README && git commit -m"update layer ARN in README" && git push origin main
+      - run: git add README.md && git commit -m"update layer ARN in README" && git push origin main
