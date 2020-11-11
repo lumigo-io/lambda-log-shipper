@@ -45,7 +45,7 @@ workflows:
         - test
         filters:
           branches:
-            only: master
+            only: main
 
 jobs:
   test:
@@ -63,3 +63,4 @@ jobs:
     steps:
       - checkout_code
       - run: ./scripts/deploy.sh
+      - run: git add README && git commit -m"update layer ARN in README" && git push origin main
