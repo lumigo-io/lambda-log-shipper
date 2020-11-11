@@ -14,10 +14,12 @@ class LogsManager:
         self.pending_logs: List[LogRecord] = []
         self.pending_logs_size: int = 0
 
-    def add_records(self, raw_records: List[dict]) -> bool:
+    def add_records(self, raw_records: List[dict]):
         new_records = [LogRecord.parse(r) for r in raw_records]
         self.pending_logs.extend(new_records)
         self.pending_logs_size += sum((len(r.record) for r in new_records), 0)
+
+    def send_batch_if_needed(self) -> bool:
         big_batch = self.pending_logs_size >= Configuration.min_batch_size
         old_batch = (
             datetime.now() - self.last_sent_time

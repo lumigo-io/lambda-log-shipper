@@ -3,7 +3,7 @@ import json
 import urllib.request
 
 from lambda_log_shipper.logs_manager import LogsManager
-from lambda_log_shipper.logs_subscriber import wait_for_logs, subscribe_to_logs
+from lambda_log_shipper.logs_subscriber import subscribe_to_logs
 from lambda_log_shipper.utils import (
     get_logger,
     lambda_service,
@@ -36,9 +36,9 @@ def extension_loop(extension_id):
     req = urllib.request.Request(url, headers={HEADERS_ID_KEY: extension_id})
     while True:
         event = json.loads(urllib.request.urlopen(req).read())
-        with never_fail("wait for logs"):
+        with never_fail("Send initial logs"):
             get_logger().debug(f"Extension got event {event}")
-            wait_for_logs(event["deadlineMs"])  # TODO: AWS have bug with this key
+            LogsManager.get_manager().send_batch_if_needed()
         if event.get("eventType") == "SHUTDOWN":
             with never_fail("send final batch"):
                 LogsManager.get_manager().send_batch()
