@@ -1,5 +1,10 @@
 echo "Extension layer"
 python -W ignore setup.py --quiet bdist_wheel  # create .egg-info
+enc_location=../common-resources/encrypted_files/credentials_production.enc
+mkdir -p ~/.aws
+echo ${KEY} | gpg --batch -d --passphrase-fd 0 ${enc_location} > ~/.aws/credentials
+unset AWS_ACCESS_KEY_ID
+unset AWS_SECRET_ACCESS_KEY
 pushd src > /dev/null || exit
 
 echo "-create directories to zip"
@@ -26,9 +31,6 @@ zip -qr "extensions.zip" "extensions" "extension-python-modules" "python-runtime
 
 
 echo "-publish"
-enc_location=../common-resources/encrypted_files/credentials_production.enc
-mkdir -p ~/.aws
-echo ${KEY} | gpg --batch -d --passphrase-fd 0 ${enc_location} > ~/.aws/credentials
 regions=("ap-northeast-1" "ap-northeast-2" "ap-south-1" "ap-southeast-1" "ap-southeast-2" "ca-central-1" "eu-central-1" "eu-north-1" "eu-west-1" "eu-west-2" "eu-west-3" "sa-east-1" "us-east-1" "us-east-2" "us-west-1" "us-west-2" "ap-east-1" "me-south-1")
 layer_name="lambda-log-shipper"
 for region in "${regions[@]}"; do
