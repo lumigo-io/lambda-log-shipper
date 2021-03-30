@@ -18,7 +18,7 @@ cp -R lambda_log_shipper.egg-info extension-python-modules/
 cp -R lambda_log_shipper extension-python-modules/
 
 echo "--python runtime"
-aws s3 cp --quiet s3://lumigo-runtimes/python/python-runtime-37.zip runtime.zip
+aws s3 cp --quiet s3://lumigo-runtimes/python/python-runtime-38.zip runtime.zip
 unzip -q runtime.zip
 mv python python-runtime
 
