@@ -9,4 +9,8 @@ if [[ $LD_LIBRARY_PATH != *python* ]]; then
   export PYTHONPATH=$PYTHONPATH:/opt/extension-python-modules:/opt/python-runtime/runtime
 fi
 
-/opt/python-runtime/lang/bin/python3.7 /opt/extension-python-modules/lambda_log_shipper/extension_main.py
+if [ -f /var/lang/bin/python ]; then
+  /var/lang/bin/python /opt/extension-python-modules/lambda_log_shipper/extension_main.py
+else
+  /opt/python-runtime/lang/bin/python3.8 /opt/extension-python-modules/lambda_log_shipper/extension_main.py
+fi
