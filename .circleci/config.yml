@@ -62,7 +62,7 @@ jobs:
     steps:
       - checkout_code
       - run: . venv/bin/activate && ./scripts/checks.sh
-      - run: . venv/bin/activate && bash <(curl -s https://codecov.io/bash)
+      - run: ../utils/common_bash/defaults/code_cov.sh
 
 
   deploy:
