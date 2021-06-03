@@ -10,7 +10,7 @@ setuptools.setup(
     url="https://github.com/lumigo-io/lambda-log-shipper.git",
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
-    install_requires=["urllib3==1.25.10", "pytest-cov", "pytest", "boto3", "moto"],
+    install_requires=["urllib3==1.26.5", "pytest-cov", "pytest", "boto3", "moto"],
     license="Apache License 2.0",
     classifiers=[
         "Programming Language :: Python :: 3",
