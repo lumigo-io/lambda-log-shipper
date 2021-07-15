@@ -26,10 +26,9 @@ class S3Handler(LogsHandler):
 
     @staticmethod
     def generate_key_name(records: List[LogRecord]):
-        lambda_name = os.environ.get("AWS_LAMBDA_FUNCTION_NAME", "unknown")
         t = min(r.log_time for r in records)
-        directory = f"logs/{t.year}/{t.month}/{t.day}/{t.hour}/"
-        return f"{directory}{t.minute}:{t.second}:{t.microsecond}-{random.random()}"
+        directory = f"logs/{t.year}/{t.month}/{t.day}/"
+        return f"{directory}{t.hour}:{t.minute}:{t.second}:{t.microsecond}-{random.random()}"
 
     @staticmethod
     def format_records(records: List[LogRecord]) -> bytes:
