@@ -1,3 +1,9 @@
+This repo is deprecated in favor of:
+https://github.com/lumigo-io/lambda-telemetry-shipper
+
+
+----------------------------------------------------------
+
 <p align="center">
  <img width="20%" height="20%" src="./logo.svg">
 </p>
